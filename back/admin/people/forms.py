@@ -57,65 +57,65 @@ class NewHireAddForm(forms.ModelForm):
             Div(
                 Div(
                     Field("first_name"),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
                 Div(
                     Field("last_name"),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
                 css_class="row",
             ),
             Div(
                 Div(
                     Field("email"),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
                 Div(
                     Field("phone"),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
                 css_class="row",
             ),
             Div(
                 Div(
                     Field("position"),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
                 Div(
                     Field("start_day"),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
                 css_class="row",
             ),
             Div(
                 Div(
                     Field("timezone"),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
-                Div(Field("language"), css_class="col-6"),
+                Div(Field("language"), css_class="col-12 col-md-6"),
                 css_class="row",
             ),
             Div(
-                Div(Field("department", css_class="add"), css_class="col-6"),
+                Div(Field("department", css_class="add"), css_class="col-12 col-md-6"),
                 Div(
                     UploadField(
                         "profile_image",
                         extra_context={"file": self.instance.profile_image},
                     ),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
                 css_class="row",
             ),
             Div(
                 Div(
                     Field("buddy"),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
-                Div(Field("manager"), css_class="col-6"),
+                Div(Field("manager"), css_class="col-12 col-md-6"),
                 css_class="row",
             ),
             Div(MultiSelectField("sequences"), css_class="row"),
-            Submit(name="submit", value=_("Create new hire")),
+            Submit(name="submit", value=_("Create new hire"), css_class="btn-lg mt-3"),
         )
         # Only show if the slack bot has been enabled
         if Integration.objects.filter(integration=Integration.Type.SLACK_BOT).exists():
@@ -191,13 +191,13 @@ class NewHireProfileForm(forms.ModelForm):
                     Field("first_name"),
                     Field("email"),
                     Field("position"),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
                 Div(
                     Field("last_name"),
                     Field("phone"),
                     Field("start_day"),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
                 css_class="row",
             ),
@@ -206,13 +206,13 @@ class NewHireProfileForm(forms.ModelForm):
                 css_class="row",
             ),
             Div(
-                Div(Field("department", css_class="add"), css_class="col-6"),
+                Div(Field("department", css_class="add"), css_class="col-12 col-md-6"),
                 Div(
                     UploadField(
                         "profile_image",
                         extra_context={"file": self.instance.profile_image},
                     ),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
                 css_class="row",
             ),
@@ -220,12 +220,12 @@ class NewHireProfileForm(forms.ModelForm):
                 Div(
                     Field("timezone"),
                     Field("buddy"),
-                    css_class="col-6",
+                    css_class="col-12 col-md-6",
                 ),
-                Div(Field("language"), Field("manager"), css_class="col-6"),
+                Div(Field("language"), Field("manager"), css_class="col-12 col-md-6"),
                 css_class="row",
             ),
-            Submit(name="submit", value=_("Update")),
+            Submit(name="submit", value=_("Update"), css_class="btn-lg mt-3"),
         )
 
     class Meta:
@@ -262,8 +262,8 @@ class ColleagueUpdateForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Div(
-                Div(Field("first_name"), css_class="col-6"),
-                Div(Field("last_name"), css_class="col-6"),
+                Div(Field("first_name"), css_class="col-12 col-md-6"),
+                Div(Field("last_name"), css_class="col-12 col-md-6"),
                 css_class="row",
             ),
             Div(
@@ -282,7 +282,7 @@ class ColleagueUpdateForm(forms.ModelForm):
                 ),
                 css_class="row",
             ),
-            Submit(name="submit", value="Update"),
+            Submit(name="submit", value="Update", css_class="btn-lg mt-3"),
         )
 
     class Meta:
@@ -318,8 +318,8 @@ class ColleagueCreateForm(forms.ModelForm):
         self.fields["language"].initial = Organization.objects.get().language
         self.helper.layout = Layout(
             Div(
-                Div(Field("first_name"), css_class="col-6"),
-                Div(Field("last_name"), css_class="col-6"),
+                Div(Field("first_name"), css_class="col-12 col-md-6"),
+                Div(Field("last_name"), css_class="col-12 col-md-6"),
                 css_class="row",
             ),
             Div(
@@ -337,7 +337,7 @@ class ColleagueCreateForm(forms.ModelForm):
                 ),
                 css_class="row",
             ),
-            Submit(name="submit", value="Create"),
+            Submit(name="submit", value="Create", css_class="btn-lg mt-3"),
         )
 
     class Meta:

@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ certificate.certificate.title }}</h3>
+          <div class="card-tools">
+            <a href="{% url 'certificates:download_certificate' certificate.unique_id %}" class="btn btn-primary">
+              <i class="fas fa-download"></i> {% trans "Download" %}
+            </a>
+            
+            {% if certificate.certificate.allow_linkedin and certificate.user == request.user %}
+            <button class="btn btn-info share-linkedin" data-certificate-id="{{ certificate.unique_id }}">
+              <i class="fab fa-linkedin"></i> {% trans "Share on LinkedIn" %}
+            </button>
+            {% endif %}
+            
+            {% if certificate.user == request.user %}
+            <a href="{% url 'certificates:my_certificates' %}" class="btn btn-secondary">
+              <i class="fas fa-arrow-left"></i> {% trans "Back to My Certificates" %}
+            </a>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="certificate-container">
+                {% if certificate.pdf_file %}
+                <iframe src="{{ certificate.pdf_file.get_url }}" width="100%" height="600" frameborder="0"></iframe>
+                {% else %}
+                <div class="alert alert-warning">
+                  {% trans "Certificate PDF not available." %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="certificate-info">
+                <h4>{% trans "Certificate Information" %}</h4>
+                <table class="table">
+                  <tr>
+                    <th>{% trans "Recipient" %}</th>
+                    <td>{{ certificate.user.full_name }}</td>
+                  </tr>
+                  <tr>
+                    <th>{% trans "Issued Date" %}</th>
+                    <td>{{ certificate.issued_date|date:"F d, Y" }}</td>
+                  </tr>
+                  {% if certificate.expiration_date %}
+                  <tr>
+                    <th>{% trans "Expiration Date" %}</th>
+                    <td>
+                      {{ certificate.expiration_date|date:"F d, Y" }}
+                      {% if certificate.is_expired %}
+                      <span class="badge badge-danger">{% trans "Expired" %}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endif %}
+                  <tr>
+                    <th>{% trans "Level" %}</th>
+                    <td>
+                      {% if certificate.certificate.level == 'bronze' %}
+                      <span class="badge badge-secondary">{% trans "Bronze" %}</span>
+                      {% elif certificate.certificate.level == 'silver' %}
+                      <span class="badge badge-light">{% trans "Silver" %}</span>
+                      {% elif certificate.certificate.level == 'gold' %}
+                      <span class="badge badge-warning">{% trans "Gold" %}</span>
+                      {% elif certificate.certificate.level == 'platinum' %}
+                      <span class="badge badge-info">{% trans "Platinum" %}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% if certificate.certificate.sequence %}
+                  <tr>
+                    <th>{% trans "Sequence" %}</th>
+                    <td>{{ certificate.certificate.sequence.name }}</td>
+                  </tr>
+                  {% endif %}
+                </table>
+                
+                {% if certificate.certificate.skills.exists %}
+                <h4>{% trans "Skills" %}</h4>
+                <ul class="list-group">
+                  {% for skill in certificate.certificate.skills.all %}
+                  <li class="list-group-item">
+                    <strong>{{ skill.name }}</strong>
+                    {% if skill.description %}
+                    <p class="mb-0 text-muted">{{ skill.description }}</p>
+                    {% endif %}
+                  </li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                
+                <h4 class="mt-4">{% trans "Verification" %}</h4>
+                <p>{% trans "This certificate can be verified using the following unique ID:" %}</p>
+                <div class="input-group">
+                  <input type="text" class="form-control" value="{{ certificate.unique_id }}" readonly>
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary copy-id" type="button">
+                      <i class="fas fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+                <p class="mt-2">
+                  <small class="text-muted">
+                    {% trans "Verification URL:" %} 
+                    <a href="{{ request.build_absolute_uri }}">{{ request.build_absolute_uri }}</a>
+                  </small>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if certificate.user == request.user and certificate.certificate.show_celebration and request.session.earned_certificate_id == certificate.id %}
+<!-- Celebration Modal -->
+<div class="modal fade" id="celebrationModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <div class="celebration-animation">
+          <i class="fas fa-certificate fa-5x text-warning mb-3"></i>
+          <h3>{% trans "Congratulations!" %}</h3>
+          <p>{% trans "You've earned a certificate for completing" %} {{ certificate.certificate.sequence.name }}</p>
+          <div class="certificate-preview-small">
+            {% if certificate.pdf_file %}
+            <img src="?thumbnail=1" alt="{{ certificate.certificate.title }}" class="img-fluid">
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">{% trans "View My Certificate" %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(function() {
+    // Copy certificate ID
+    $('.copy-id').on('click', function() {
+      var copyText = $(this).closest('.input-group').find('input')[0];
+      copyText.select();
+      document.execCommand("copy");
+      
+      // Show tooltip
+      $(this).tooltip({
+        title: "{% trans 'Copied!' %}",
+        trigger: 'manual'
+      }).tooltip('show');
+      
+      // Hide tooltip after 2 seconds
+      setTimeout(function() {
+        $('.copy-id').tooltip('hide');
+      }, 2000);
+    });
+    
+    // LinkedIn sharing
+    $('.share-linkedin').on('click', function() {
+      var certificateId = $(this).data('certificate-id');
+      var certificateUrl = window.location.href;
+      
+      // Open LinkedIn sharing dialog
+      var linkedinUrl = 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=' + 
+                        encodeURIComponent('{{ request.site.name }}') + 
+                        '&organizationId=1&issueYear=' + new Date().getFullYear() + 
+                        '&issueMonth=' + (new Date().getMonth() + 1) + 
+                        '&certUrl=' + encodeURIComponent(certificateUrl);
+      
+      window.open(linkedinUrl, '_blank');
+      
+      // Mark as shared
+      $.post('{% url "certificates:share_linkedin" certificate.unique_id %}');
+    });
+    
+    {% if certificate.user == request.user and certificate.certificate.show_celebration and request.session.earned_certificate_id == certificate.id %}
+    // Show celebration modal
+    $('#celebrationModal').modal('show');
+    
+    // Clear session variable
+    $.post('{% url "clear_session_variable" %}', {
+      variable_name: 'earned_certificate_id',
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    });
+    
+    // Confetti animation
+    var confettiSettings = {
+      target: 'confetti-canvas',
+      max: 150,
+      size: 1.5,
+      animate: true,
+      props: ['circle', 'square', 'triangle', 'line'],
+      colors: [[165,104,246],[230,61,135],[0,199,228],[253,214,126]],
+      clock: 25,
+      start_from_edge: true,
+      respawn: true
+    };
+    var confetti = new ConfettiGenerator(confettiSettings);
+    confetti.render();
+    
+    $('#celebrationModal').on('hidden.bs.modal', function() {
+      confetti.clear();
+    });
+    {% endif %}
+  });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .certificate-container {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    background-color: #f8f9fa;
+  }
+  
+  .certificate-info {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .celebration-animation {
+    padding: 30px 0;
+  }
+  
+  .certificate-preview-small {
+    max-width: 300px;
+    margin: 20px auto;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    background-color: white;
+  }
+  
+  #confetti-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+</style>
+{% endblock %}

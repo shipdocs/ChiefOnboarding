@@ -84,11 +84,22 @@ class UserView(generics.CreateAPIView):
 
 class EmployeeView(generics.ListAPIView):
     """
-    API endpoint that lists all employees
+    API endpoint that lists employees based on user permissions
     """
 
-    queryset = User.objects.all().order_by("id")
     serializer_class = EmployeeSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        # Admin can see all users
+        if user.role == get_user_model().Role.ADMIN:
+            return User.objects.all().order_by("id")
+        # Managers can see their direct reports
+        elif user.role == get_user_model().Role.MANAGER:
+            return User.objects.filter(manager=user).order_by("id")
+        # Regular users can only see themselves
+        else:
+            return User.objects.filter(id=user.id)
 
 
 class SequenceView(generics.ListAPIView):

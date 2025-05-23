@@ -50,6 +50,13 @@ class Organization(models.Model):
     logo = models.ForeignKey(
         File, verbose_name=_("Logo"), on_delete=models.CASCADE, null=True
     )
+    logo_url = models.URLField(
+        verbose_name=_("Logo URL"),
+        max_length=500,
+        blank=True,
+        default="",
+        help_text=_("URL to an external logo image. This will be used instead of an uploaded logo if provided.")
+    )
 
     # login options
     credentials_login = models.BooleanField(
@@ -146,6 +153,7 @@ class Organization(models.Model):
     timed_triggers_last_check = models.DateTimeField(auto_now_add=True)
     custom_email_template = models.TextField(
         default="",
+        blank=True,
         verbose_name=_("Base email template"),
         help_text=_(
             "Leave blank to use the default one. "
@@ -156,6 +164,227 @@ class Organization(models.Model):
         models.EmailField(),
         default=list,
         help_text="Emails which get ignored by the importer",
+    )
+    ai_api_key = models.CharField(
+        verbose_name=_("AI API Key"),
+        max_length=255,
+        blank=True,
+        help_text=_("API key for AI content generation (e.g., OpenAI API key)"),
+    )
+    ai_default_context = models.TextField(
+        verbose_name=_("AI Default Context"),
+        blank=True,
+        help_text=_("Default context for AI content generation (e.g., 'You are writing content for an employee onboarding platform')"),
+    )
+    ai_default_tone = models.CharField(
+        verbose_name=_("AI Default Tone"),
+        max_length=100,
+        blank=True,
+        default="professional and friendly",
+        help_text=_("Default tone for AI content generation (e.g., 'professional', 'friendly', 'casual')"),
+    )
+
+    # Email settings
+    email_admin_task_notifications = models.BooleanField(
+        verbose_name=_("Send email notifications for admin tasks"),
+        help_text=_("Notify administrators when they are assigned tasks or when tasks are updated"),
+        default=True,
+    )
+    email_admin_task_comments = models.BooleanField(
+        verbose_name=_("Send email notifications for admin task comments"),
+        help_text=_("Notify administrators when someone comments on their tasks"),
+        default=True,
+    )
+    email_admin_updates = models.BooleanField(
+        verbose_name=_("Send email notifications for system updates"),
+        help_text=_("Notify administrators about important system updates and changes"),
+        default=True,
+    )
+    email_signature = models.TextField(
+        verbose_name=_("Email signature"),
+        help_text=_("This signature will be added to all outgoing emails"),
+        default="",
+        blank=True,
+    )
+    email_from_name = models.CharField(
+        verbose_name=_("Email 'From' name"),
+        help_text=_("The name that will appear in the 'From' field of emails (e.g., 'Your Company Onboarding')"),
+        max_length=255,
+        default="",
+        blank=True,
+    )
+
+    # Storage settings
+    storage_provider = models.CharField(
+        verbose_name=_("Storage Provider"),
+        max_length=20,
+        choices=[
+            ('local', _('Local Storage')),
+            ('s3', _('Amazon S3 or Compatible')),
+        ],
+        default='local',
+        help_text=_("Select which storage provider to use for file uploads"),
+    )
+
+    # S3 settings
+    s3_endpoint_url = models.CharField(
+        verbose_name=_("S3 Endpoint URL"),
+        max_length=255,
+        default="https://s3.amazonaws.com",
+        blank=True,
+        help_text=_("The endpoint URL for S3 or S3-compatible storage (e.g., 'https://s3.amazonaws.com')"),
+    )
+    s3_access_key = models.CharField(
+        verbose_name=_("S3 Access Key"),
+        max_length=255,
+        default="",
+        blank=True,
+        help_text=_("Access key for S3 or S3-compatible storage"),
+    )
+    s3_secret_key = models.CharField(
+        verbose_name=_("S3 Secret Key"),
+        max_length=255,
+        default="",
+        blank=True,
+        help_text=_("Secret key for S3 or S3-compatible storage"),
+    )
+    s3_bucket_name = models.CharField(
+        verbose_name=_("S3 Bucket Name"),
+        max_length=255,
+        default="",
+        blank=True,
+        help_text=_("Bucket name for S3 or S3-compatible storage"),
+    )
+    s3_region = models.CharField(
+        verbose_name=_("S3 Region"),
+        max_length=255,
+        default="us-east-1",
+        blank=True,
+        help_text=_("Region for S3 or S3-compatible storage (e.g., 'us-east-1')"),
+    )
+
+    # Email provider settings
+    email_provider = models.CharField(
+        verbose_name=_("Email Provider"),
+        max_length=20,
+        choices=[
+            ('smtp', _('SMTP')),
+            ('mailgun', _('Mailgun')),
+            ('mailjet', _('Mailjet')),
+            ('mandrill', _('Mandrill')),
+            ('postmark', _('Postmark')),
+            ('sendgrid', _('SendGrid')),
+            ('sendinblue', _('Sendinblue')),
+            ('mailersend', _('MailerSend')),
+        ],
+        default='',
+        blank=True,
+        help_text=_("Select which email provider to use for sending emails"),
+    )
+    default_from_email = models.CharField(
+        verbose_name=_("Default From Email"),
+        max_length=255,
+        default="",
+        blank=True,
+        help_text=_("The email address that will be used as the sender (e.g., 'onboarding@yourcompany.com' or 'Your Company <onboarding@yourcompany.com>')"),
+    )
+
+    # SMTP settings
+    email_host = models.CharField(
+        verbose_name=_("SMTP Host"),
+        max_length=255,
+        default="",
+        blank=True,
+        help_text=_("SMTP server hostname (e.g., 'smtp.gmail.com')"),
+    )
+    email_port = models.IntegerField(
+        verbose_name=_("SMTP Port"),
+        default=587,
+        blank=True,
+        null=True,
+        help_text=_("SMTP server port (usually 25, 465, or 587)"),
+    )
+    email_host_user = models.CharField(
+        verbose_name=_("SMTP Username"),
+        max_length=255,
+        default="",
+        blank=True,
+        help_text=_("SMTP server username"),
+    )
+    email_host_password = models.CharField(
+        verbose_name=_("SMTP Password"),
+        max_length=255,
+        default="",
+        blank=True,
+        help_text=_("SMTP server password"),
+    )
+    email_use_tls = models.BooleanField(
+        verbose_name=_("Use TLS"),
+        default=True,
+        help_text=_("Use TLS encryption for SMTP connection"),
+    )
+    email_use_ssl = models.BooleanField(
+        verbose_name=_("Use SSL"),
+        default=False,
+        help_text=_("Use SSL encryption for SMTP connection (don't enable both TLS and SSL)"),
+    )
+
+    # Provider-specific settings
+    mailgun_api_key = models.CharField(
+        verbose_name=_("Mailgun API Key"),
+        max_length=255,
+        default="",
+        blank=True,
+    )
+    mailgun_domain = models.CharField(
+        verbose_name=_("Mailgun Domain"),
+        max_length=255,
+        default="",
+        blank=True,
+    )
+    mailjet_api_key = models.CharField(
+        verbose_name=_("Mailjet API Key"),
+        max_length=255,
+        default="",
+        blank=True,
+    )
+    mailjet_secret_key = models.CharField(
+        verbose_name=_("Mailjet Secret Key"),
+        max_length=255,
+        default="",
+        blank=True,
+    )
+    mandrill_api_key = models.CharField(
+        verbose_name=_("Mandrill API Key"),
+        max_length=255,
+        default="",
+        blank=True,
+    )
+    postmark_server_token = models.CharField(
+        verbose_name=_("Postmark Server Token"),
+        max_length=255,
+        default="",
+        blank=True,
+    )
+    sendgrid_api_key = models.CharField(
+        verbose_name=_("SendGrid API Key"),
+        max_length=255,
+        default="",
+        blank=True,
+    )
+    sendinblue_api_key = models.CharField(
+        verbose_name=_("Sendinblue API Key"),
+        max_length=255,
+        default="",
+        blank=True,
+    )
+
+    # MailerSend settings
+    mailersend_api_key = models.CharField(
+        verbose_name=_("MailerSend API Key"),
+        max_length=255,
+        default="",
+        blank=True,
     )
 
     object = ObjectManager()
@@ -189,6 +418,17 @@ class Organization(models.Model):
         return us_tz.normalize(local.astimezone(us_tz))
 
     def create_email(self, context):
+        # Add email signature to context if it exists
+        if self.email_signature and self.email_signature.strip():
+            if 'content' in context and isinstance(context['content'], list):
+                # Add signature as a new content block
+                context['content'].append({
+                    "type": "paragraph",
+                    "data": {
+                        "text": self.email_signature
+                    }
+                })
+
         if self.custom_email_template == "":
             return render_to_string("email/base.html", context)
         else:
@@ -197,6 +437,11 @@ class Organization(models.Model):
 
     @cached_property
     def get_logo_url(self):
+        # First check if a logo URL is set
+        if self.logo_url:
+            return self.logo_url
+
+        # If no URL is set, check for an uploaded logo file
         if self.logo is None:
             return ""
 

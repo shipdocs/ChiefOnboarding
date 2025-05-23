@@ -20,7 +20,7 @@ def email_new_admin_cred(user):
             "type": "paragraph",
             "data": {
                 "text": _(
-                    "Someone in your organisation invited you to join ChiefOnboarding."
+                    "Someone in your organisation invited you to join ShipDocs Maritime Onboarding."
                     "Here are your login details:"
                 ),
             },

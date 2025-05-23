@@ -1,3 +1,5 @@
+import base64
+import os
 import pytz
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Field, Layout, Submit
@@ -5,7 +7,18 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
+
+
+def generate_fernet_salt():
+    """Generate a secure random Fernet salt."""
+    return base64.urlsafe_b64encode(os.urandom(16)).decode()
+
+
+def generate_secret_key():
+    """Generate a secure random SECRET_KEY."""
+    return get_random_string(length=64)
 
 
 class InitalAdminAccountForm(UserCreationForm):
@@ -16,6 +29,12 @@ class InitalAdminAccountForm(UserCreationForm):
     language = forms.ChoiceField(
         label=_("Language"),
         choices=settings.LANGUAGES,
+    )
+    generate_security_keys = forms.BooleanField(
+        label=_("Generate secure encryption keys"),
+        help_text=_("Recommended: Generate secure random keys for encryption. These will be saved to your .env file."),
+        initial=True,
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):

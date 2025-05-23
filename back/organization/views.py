@@ -25,7 +25,7 @@ from slack_bot.models import SlackChannel
 from users.mixins import AdminPermMixin, LoginRequiredMixin
 from users.models import User
 
-from .forms import InitalAdminAccountForm
+from .forms import InitalAdminAccountForm, generate_fernet_salt, generate_secret_key
 from .models import Notification, Organization
 
 
@@ -105,6 +105,36 @@ class InitialSetupView(CreateView):
 
     @transaction.atomic
     def form_valid(self, form):
+        # Generate security keys if requested
+        if form.cleaned_data.get("generate_security_keys", True):
+            fernet_salt = generate_fernet_salt()
+            secret_key = generate_secret_key()
+
+            # Update or create .env file with secure keys
+            env_path = os.path.join(settings.BASE_DIR, ".env")
+            env_content = ""
+
+            # Read existing .env file if it exists
+            if os.path.exists(env_path):
+                with open(env_path, "r") as f:
+                    env_content = f.read()
+
+            # Update or add FERNET_SALT
+            if "FERNET_SALT=" in env_content:
+                env_content = self._replace_env_var(env_content, "FERNET_SALT", fernet_salt)
+            else:
+                env_content += f"\nFERNET_SALT={fernet_salt}"
+
+            # Update or add SECRET_KEY
+            if "SECRET_KEY=" in env_content:
+                env_content = self._replace_env_var(env_content, "SECRET_KEY", secret_key)
+            else:
+                env_content += f"\nSECRET_KEY={secret_key}"
+
+            # Write updated .env file
+            with open(env_path, "w") as f:
+                f.write(env_content.strip())
+
         org = Organization.objects.create(
             name=form.cleaned_data["name"],
             timezone=form.cleaned_data["timezone"],
@@ -138,3 +168,9 @@ class InitialSetupView(CreateView):
         demo_user.save()
 
         return redirect("login")
+
+    def _replace_env_var(self, content, var_name, new_value):
+        """Replace an environment variable in the content."""
+        import re
+        pattern = re.compile(f"{var_name}=.*")
+        return pattern.sub(f"{var_name}={new_value}", content)

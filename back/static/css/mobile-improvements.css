@@ -1,0 +1,144 @@
+/* Mobile improvements for ShipDocs Maritime Onboarding */
+
+/* Improve form elements on mobile */
+@media (max-width: 767.98px) {
+  /* Make form controls larger and easier to tap */
+  .form-control,
+  .form-select,
+  .btn {
+    min-height: 44px;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+
+  /* Improve date inputs on mobile */
+  input[type="date"] {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  /* Make checkboxes and radio buttons easier to tap */
+  .form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+    margin-top: 0.15em;
+  }
+
+  /* Improve select2 and selectize controls */
+  .selectize-input,
+  .select2-container .select2-selection {
+    min-height: 44px;
+    padding-top: 8px;
+  }
+
+  /* Improve file upload controls */
+  input[type="file"] {
+    font-size: 14px;
+  }
+
+  /* Add more spacing between form groups */
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Make submit buttons more prominent */
+  .btn-primary {
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  /* Improve multi-select fields */
+  .select-multiple-field {
+    max-height: none;
+  }
+
+  /* Improve form labels */
+  label {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Improve error messages */
+  .invalid-feedback {
+    font-size: 0.875rem;
+  }
+
+  /* Improve help text */
+  .form-text {
+    font-size: 0.875rem;
+  }
+}
+
+/* Improve tables on mobile */
+@media (max-width: 767.98px) {
+  /* Make sure all tables are responsive on mobile */
+  .table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Improve table cell padding */
+  .table td,
+  .table th {
+    padding: 0.75rem;
+  }
+
+  /* Improve to-do items on mobile */
+  .table .form-check-input {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: 0.25rem;
+  }
+
+  /* Make view buttons more prominent on mobile */
+  .table .btn {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+
+  /* Improve text truncation on mobile */
+  .td-truncate .text-truncate {
+    max-width: 200px;
+    font-size: 1rem;
+  }
+}
+
+/* Improve colleague cards on mobile */
+@media (max-width: 767.98px) {
+  /* Make card buttons easier to tap */
+  .card-btn {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+
+  /* Improve profile images on mobile */
+  .avatar-xl {
+    width: 6rem;
+    height: 6rem;
+  }
+
+  /* Improve card spacing */
+  .card {
+    margin-bottom: 1rem;
+  }
+
+  /* Improve card body padding */
+  .card-body {
+    padding: 1.25rem;
+  }
+}
+
+/* Improve navigation on mobile */
+@media (max-width: 767.98px) {
+  /* Make dropdown menus easier to tap */
+  .dropdown-item {
+    padding: 0.5rem 1rem;
+  }
+
+  /* Improve navbar toggler */
+  .navbar-toggler {
+    padding: 0.5rem;
+  }
+}

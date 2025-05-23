@@ -3,6 +3,7 @@ from django.urls import include, path
 from django.views.generic.base import TemplateView
 
 import user_auth
+from admin.admin_onboarding import urls as admin_onboarding_urls
 from admin.admin_tasks import urls as admin_tasks_urls
 from admin.appointments import urls as appointment_urls
 from admin.badges import urls as badge_urls
@@ -17,6 +18,7 @@ from admin.settings import urls as settings_urls
 from admin.templates import urls as template_urls
 from admin.to_do import urls as to_do_urls
 from api import urls as public_api_urls
+from certificates import urls as certificate_urls
 from new_hire import urls as new_hire_urls
 from organization import urls as org_urls
 from organization import views as org_views
@@ -40,6 +42,7 @@ urlpatterns = [
     path("admin/settings/", include(settings_urls)),
     path("admin/tasks/", include(admin_tasks_urls)),
     path("admin/templates/", include(template_urls)),
+    path("admin/onboarding/", include(admin_onboarding_urls)),
     path("admin/templates/todo/", include(to_do_urls)),
     path("admin/templates/hardware/", include(hardware_urls)),
     path("admin/templates/introductions/", include(intro_urls)),
@@ -51,6 +54,7 @@ urlpatterns = [
     path("admin/sequences/", include(sequences_urls)),
     path("api/slack/", include(slack_urls)),
     path("admin/integrations/", include(integrations_urls)),
+    path("certificates/", include((certificate_urls, "certificates"), namespace="certificates")),
 ]
 
 # API

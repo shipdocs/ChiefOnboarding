@@ -31,16 +31,35 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import base64
+import os
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import force_bytes
 
 backend = default_backend()
 info = b"django-fernet-fields"
-# We need reproducible key derivation, so we can't use a random salt
-salt = b"django-fernet-fields-hkdf-salt"
+
+# Get salt from settings, or use a default for backwards compatibility
+# but warn that this is insecure
+def get_fernet_salt():
+    if hasattr(settings, 'FERNET_SALT') and settings.FERNET_SALT:
+        return settings.FERNET_SALT
+    else:
+        import warnings
+        warnings.warn(
+            "FERNET_SALT is not configured in settings. Using default salt, which is insecure. "
+            "Please set FERNET_SALT in your settings file.",
+            category=RuntimeWarning
+        )
+        # For backwards compatibility, use the old static salt
+        return b"django-fernet-fields-hkdf-salt"
+
+# Get the salt from settings
+salt = get_fernet_salt()
 
 
 def derive_fernet_key(input_key):
