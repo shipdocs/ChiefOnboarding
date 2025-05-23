@@ -19,13 +19,13 @@ class Form {
   }
 
   /**
-   * Disallow to use native Enter behaviour
+   * Allow to use native Enter behaviour for line breaks
    *
    * @returns {boolean}
    * @public
    */
   static get enableLineBreaks() {
-    return false;
+    return true;
   }
 
   /**
@@ -115,7 +115,9 @@ class Form {
 
     // fill with data
     if (this._data.text != "") {
-      this._elements.wrapper.textContent = this._data.text
+      // Replace newlines with <br> tags to preserve formatting
+      const formattedText = this._data.text.replace(/\n/g, '<br>');
+      this._elements.wrapper.innerHTML = formattedText;
     }
     // if (this._data.text.length) {
     //   this._elements.wrapper.appendChild(this._make('p', this.CSS.item));
@@ -254,7 +256,10 @@ class Form {
    * @returns {FormData}
    */
   get data() {
-    this._data.text = this._elements.wrapper.innerText
+    // Get text content and preserve line breaks
+    const rawText = this._elements.wrapper.innerHTML;
+    // Convert <br> tags back to newlines for storage
+    this._data.text = rawText.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]*>/g, '');
 
     return this._data;
   }
